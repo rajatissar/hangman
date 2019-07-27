@@ -11,8 +11,8 @@
 		"nodemon": "^1.19.1"
 	},
 	"scripts": {
-		"start": "node server.js",
-		"dev": "./node_modules/.bin/nodemon server.js"
+		"start": "node index.js",
+		"dev": "./node_modules/.bin/nodemon index.js"
 	},
 	"author": "",
 	"license": "MIT"
