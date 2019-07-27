@@ -1,7 +1,7 @@
 // Given PoolValues
 const pool_values = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 // Given Ques, Ans
-const ques_ans_obj = [
+const ques_ans_array = [
   { ques:"Founder of Facebook", ans: "MARK ZUCKERBURG" },
   { ques:"Founder of Google", ans: "LARRY PAGE" },
   { ques:"Capital of INDIA", ans: "NEW DELHI" },
@@ -13,14 +13,16 @@ const ques_ans_obj = [
   { ques:"Highest Award to an Indian", ans: "BHARAT RATNA" },
   { ques:"World richest man", ans: "BILL GATES" }
 ];
-let time_in_seconds = 12;
+const max_score = ques_ans_array.length;
+const number_of_chance_for_each_ques = 6;
+let is_game_playing = false;
+let timer_time = 60;
 let set_interval_timer_instance;
 let previous_asked_ques_ans_indexes = [];
-let right_no_of_inputs_for_question;
 let current_answer;
-const number_of_chance_for_ques = 6;
 let right_guess = 0;
 let wrong_guess = 0;
+let right_no_of_inputs_for_question = 0;
 let score = 0;
 
 // function to create input box so that user can choose from specific characters
@@ -31,6 +33,28 @@ function input_text_boxes_creation () {
 
 input_text_boxes_creation();
 
+function init_before_each_ques () {
+  right_guess = 0;
+  wrong_guess = 0;
+  right_no_of_inputs_for_question = 0;
+  document.getElementById("ques").innerHTML = "";
+  document.getElementById("guess").innerHTML = "";
+  document.getElementById("hangman_image").src = "images/0.jpg";
+  pool_values.forEach((character) => {
+    document.getElementById(character).style.backgroundColor = "white";
+    document.getElementById(character).style.color = "black";
+  });
+};
+
+function init_game_to_starting_state () {
+  init_before_each_ques();
+  is_game_playing = false;
+  score = 0;
+  document.getElementById("timer").value = "";
+  document.getElementById("score").value = "0";
+  clearInterval(set_interval_timer_instance);
+}
+
 function toggle_button_name () {
   if(document.getElementById("play_game_button").innerHTML == "End Game") {
     document.getElementById("play_game_button").innerHTML = "Start Game";
@@ -38,29 +62,23 @@ function toggle_button_name () {
   else {
     document.getElementById("play_game_button").innerHTML = "End Game";
   }
-  // clearInterval(set_interval_timer_instance);
 };
 
 // function to create timer
 function start_timer () {
+  timer_time= 60;
   clearInterval(set_interval_timer_instance);
   set_interval_timer_instance = setInterval(function () {
-    document.getElementById("timer").value = time_in_seconds;
-    if (time_in_seconds === 0) {
+    document.getElementById("timer").value = timer_time;
+    if (timer_time === 0) {
       end_game();
       return clearInterval(set_interval_timer_instance);
     }
-    else if (time_in_seconds <= 10){
+    else if (timer_time <= 10){
       document.getElementById("timer").style.color = "red";
     }
-    time_in_seconds--;    
+    timer_time--;    
   }, 1000);
-};
-
-// removing previously created div
-function removing_previous_created_ques_ans () {
-  document.getElementById("ques").innerHTML = "";
-  document.getElementById("guess").innerHTML = "";
 };
 
 // generate random ques
@@ -75,69 +93,45 @@ function generate_random_question_index() {
 };
 
 function create_ques_ans_boxes(index) {
-  const ques = ques_ans_obj[index].ques;
-  const answer = ques_ans_obj[index].ans;
-  current_answer = ques_ans_obj[index].ans;
+  const current_ques = ques_ans_array[index].ques;
+  current_answer = ques_ans_array[index].ans;
 
   // create ques as an h3 element in HTML
   const ques_element = document.createElement("h3");
-  const ques_content = document.createTextNode(ques);
+  const ques_content = document.createTextNode(current_ques);
   ques_element.appendChild(ques_content);
   document.getElementById("ques").appendChild(ques_element);
 
   // create dynamic div for guess
-  ans_len = answer.length;
+  ans_len = current_answer.length;
   let ans_div_container = document.getElementById("guess");
   for (let i = 0; i < ans_len; i++) {
     let ans_div = document.createElement("div");
     ans_div_container.appendChild(ans_div);
     ans_div.id = i;
-    if (answer[i] == " ") {
+    if (current_answer[i] == " ") {
       document.getElementById(i).style.visibility = "hidden";
       document.getElementById(i).style.clear = "left";
     }
-  }
-};
-
-function get_right_no_of_inputs_for_question (index) {
-  const answer = ques_ans_obj[index].ans;
-  const answer_length = answer.length;
-  let inputs = 0;
-  for (let i = 0; i < answer_length; i++) {
-    if (answer[i] !== " ") {
-      inputs++;
+    else{
+      right_no_of_inputs_for_question++;
     }
   }
-  return inputs;
 };
-   
-function is_answer_contains_character (character) {
-  if(current_answer.indexOf(character) != -1) {
-    return true;
-  }
-  return false;
-}
 
 function start_game () {
-  document.getElementById("hangman_image").src = "images/0.jpg";
+  init_game_to_starting_state();
   toggle_button_name();
   start_timer();
-  removing_previous_created_ques_ans();
+  is_game_playing = true;
   const random_ques_ans_index = generate_random_question_index();
   create_ques_ans_boxes(random_ques_ans_index);
-  right_no_of_inputs_for_question = get_right_no_of_inputs_for_question(random_ques_ans_index);
 }
 
 function end_game () {
+  alert("Game finished by you.\nYour score is " + score);
+  init_game_to_starting_state();
   toggle_button_name();
-  document.getElementById("timer").value = "";
-  document.getElementById("ques").innerHTML = "";
-  document.getElementById("guess").innerHTML = "";
-  document.getElementById("score").value = "0";
-  clearInterval(set_interval_timer_instance);
-  setTimeout(()=>{
-    alert("Game over");
-  },1000);
 }
   
 function play_game() {
@@ -147,13 +141,44 @@ function play_game() {
   else {
     end_game();
   }
-  // document.getElementById("game_container").style.visibility = "visible";
-  // document.getElementById("startGame").style.pointerEvents = "none";
+};
+
+function mark_typed_character (current_input_character) {
+  document.getElementById(current_input_character).style.backgroundColor = "black";
+  document.getElementById(current_input_character).style.color = "white";
+}
+
+function is_answer_contains_character (character) {
+  if(current_answer.indexOf(character) == -1) {
+    return false;
+  }
+  return true;
+}
+
+function game_won () {
+  alert("You won the game\nYour Score is "+ score + "\nEither end this game or refresh the screen to start a new game");
+  // location.reload();
+};
+
+function game_loose () {
+  alert("You loose the game.\nYour Score is " + score + "\nEither end this game or refresh the screen to start a new game");
+};
+
+function generate_next_ques () {  
+  init_before_each_ques();
+  const random_ques_ans_index = generate_random_question_index();
+  create_ques_ans_boxes(random_ques_ans_index);
 };
 
 function check_input_character(key) {
-  console.log('>>>>>>>>>> key', key);
+  if(key == "Enter"){
+    return play_game();
+  }
+  else if(!is_game_playing){
+   return alert("Please start the game before typing any text");
+  }
   const current_input_character = key.toUpperCase();
+  mark_typed_character(current_input_character);
   const is_present = is_answer_contains_character(current_input_character);
   if(!is_present) {
     wrong_guess++;
@@ -172,24 +197,26 @@ function check_input_character(key) {
     else if (wrong_guess == 5) {
       document.getElementById("hangman_image").src = "images/5.jpg";
     }
-    else if (wrong_guess == number_of_chance_for_ques) {
+    else if (wrong_guess == number_of_chance_for_each_ques) {
       document.getElementById("hangman_image").src = "images/6.jpg";
-      end_game();
+      game_loose();
     }
   }
   else {
-    current_answer.split('').forEach((character,index) => {
+    current_answer.split('').forEach((character, index) => {
       if(character == current_input_character && document.getElementById(index).innerHTML == "") {
         right_guess++;
-        document.getElementById(index).value = character;
+        document.getElementById(index).innerHTML = character;
       };
     })
   }
   
   if(right_guess == right_no_of_inputs_for_question) {
-    clearInterval(set_interval_timer_instance);
     score++;
-    document.getElementById("score").innerHTML = score;
-    // alert("next ques or you won");
+    document.getElementById("score").value = score;
+    if(score == max_score){
+      return game_won();
+    }
+    generate_next_ques();
   }
 };
