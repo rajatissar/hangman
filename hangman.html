@@ -1,0 +1,42 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+</head>
+
+<body onkeypress="check_input_character(event.key);">
+    <div class="game_title">
+        HANGMAN GAME
+    </div>
+    <div class="main_menu">
+        <div class="main_menu_item play_game" id="play_game_button" onclick="play_game();">Start Game</div>
+        <div class="main_menu_item">
+            <span class="output_title"> SCORE </span>
+            <input type="number" class="score" value=0 id="score" readonly>
+        </div>
+        <div class="main_menu_item">
+            <span class="output_title"> TIME </span>
+            <input type="number" class="timer" id="timer" readonly>
+        </div>
+    </div>
+    <div id="game_container" class="game_container">
+        <div id="ques_ans_container" class="ques_ans_container">
+            <center id="ques">
+                <!-- Ques Title appear here  -->
+            </center>
+            <div id="guess" class="guess">
+                <!--  answer Boxes made here -->
+            </div>
+            <div id="pool_characters_container" class="pool_characters_container">
+                <!-- All Pool Values Character made here -->
+            </div>
+        </div>
+        <div class="image_container">
+            <img id="hangman_image" class="image_style" src="images/0.jpg" />
+        </div>
+    </div>
+    <script src="js/index.js">
+    </script>
+</body>
+
+</html>
