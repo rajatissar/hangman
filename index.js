@@ -8,9 +8,9 @@ const app = express();
 app.use(express.static(__dirname));
 
 app.use("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "hangman.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.listen(process.env.PORT || PORT, () => {
-  console.log(`Hangman Game is running at port no: ${PORT}`);
+    console.log(`Hangman Game is running at port no: ${PORT}`);
 });
